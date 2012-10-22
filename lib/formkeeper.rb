@@ -326,21 +326,25 @@ module FormKeeper
       if name.nil?
         @failed_records.values.each do |record|
           record.failed_constraints.each do |constraint|
-            messages << message(action, record.name, constraint)
+            messages << @messages.get(action, record.name, constraint)
           end
         end
       else
         if @failed_records.has_key?(name.to_sym)
           record = @failed_records[name.to_sym]
           record.failed_constraints.each do |constraint|
-            messages << message(action, record.name, constraint)
+            messages << @messages.get(action, record.name, constraint)
           end
         end
       end
-      messages.select{ |m| not !m.nil? and !m.empty? }.uniq
+      messages.select{ |m| !m.nil? and !m.empty? }.uniq
     end
-    def message(action, name, constrainat)
-      @messages.get(action, name, constraint)
+    def message(action, name, constraint)
+      if @failed_records.has_key?(name.to_sym) and @failed_records[name.to_sym].failed_by?(constraint)
+        @messages.get(action, name, constraint)
+      else
+        nil
+      end
     end
   end
 
