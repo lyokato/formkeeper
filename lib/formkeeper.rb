@@ -79,7 +79,7 @@ module FormKeeper
 
     class Int < Base
       def validate(value, arg)
-        result = value =~ /^\-?[[:digit]]+$/
+        result = value =~ /^\-?[[:digit:]]+$/
         result = !result if !arg
         result
       end
@@ -87,7 +87,7 @@ module FormKeeper
 
     class Uint < Base
       def validate(value, arg)
-        result = value =~ /^[[:digit]]+$/
+        result = value =~ /^[[:digit:]]+$/
         result = !result if !arg
         result
       end
@@ -95,7 +95,7 @@ module FormKeeper
 
     class Alpha < Base
       def validate(value, arg)
-        result = value =~ /^[[:alpha]]+$/
+        result = value =~ /^[[:alpha:]]+$/
         result = !result if !arg
         result
       end
@@ -103,7 +103,7 @@ module FormKeeper
 
     class AlphaSpace < Base
       def validate(value, arg)
-        result = value =~ /^[[:alpha][:space]]+$/
+        result = value =~ /^[[:alpha:][:space:]]+$/
         result = !result if !arg
         result
       end
@@ -111,7 +111,7 @@ module FormKeeper
 
     class Alnum < Base
       def validate(value, arg)
-        result = value =~ /^[[:alnum]]+$/
+        result = value =~ /^[[:alnum:]]+$/
         result = !result if !arg
         result
       end
@@ -119,7 +119,7 @@ module FormKeeper
 
     class AlnumSpace < Base
       def validate(value, arg)
-        result = value =~ /^[[:alnum][:space]]+$/
+        result = value =~ /^[[:alnum:][:space:]]+$/
         result = !result if !arg
         result
       end
