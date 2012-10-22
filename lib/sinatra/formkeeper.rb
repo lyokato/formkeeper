@@ -23,6 +23,49 @@
 require 'formkeeper'
 
 module Sinatra
+  # = Sinatra::FormKeeper
+  #
+  # Example:
+  #
+  #   module MyApp < Sinatra::Base
+  #
+  #     register Sinatra::FormKeeper
+  #
+  #     def post '/login' do
+  #
+  #       form do 
+  #         filters :strip
+  #         field :username, :present => true, :length => 4..8, :ascii => true
+  #         field :password, :present => true, :length => 4..8, :ascii => true
+  #       end
+  #
+  #       # check if validation has failed or not
+  #       if form.failed?
+  #         output = erb :login
+  #         fill_in_form(output)
+  #       else
+  #         # you can use filtered, valid parameters through form[key]
+  #         authenticate(form[:username], form[:password])
+  #         ... 
+  #       end
+  #     end
+  #   end
+  #
+  #   @@ login
+  #   <html>
+  #   <head><title>Login</title></head>
+  #   <body>
+  #   <% if form.failed? %>
+  #   ... TODO
+  #   <% end %>
+  #   <form action="/login" method="post">
+  #     <label>name</label><input type="text" name="username" /><br />
+  #     <label>password</label><input type="password" name="password" /><br />
+  #     <input type="submit" value="login">
+  #   </form>
+  #   </body>
+  #   </html>
+  #
   module FormKeeper
     def form_failure_messages(arg)
       case arg
