@@ -19,13 +19,15 @@
 # LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION 
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
-
 require 'formkeeper'
 
 module Sinatra
   # = Sinatra::FormKeeper
   #
   # Example:
+  #
+  #   require 'sinatra/base'
+  #   require 'sinatra/formkeeper'
   #
   #   module MyApp < Sinatra::Base
   #
@@ -46,7 +48,8 @@ module Sinatra
   #       else
   #         # you can use filtered, valid parameters through form[key]
   #         authenticate(form[:username], form[:password])
-  #         ... 
+  #         ...
+  #         redirect '/mypage'
   #       end
   #     end
   #   end
@@ -56,7 +59,7 @@ module Sinatra
   #   <head><title>Login</title></head>
   #   <body>
   #   <% if form.failed? %>
-  #   ... TODO
+  #     <p>Found invalid input, check it and try again.</p>
   #   <% end %>
   #   <form action="/login" method="post">
   #     <label>name</label><input type="text" name="username" /><br />

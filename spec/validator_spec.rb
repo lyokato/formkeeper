@@ -269,6 +269,5 @@ describe FormKeeper::Validator do
     report.failed_on?(:same_email_address).should be_true
 
   end
-
 end
 

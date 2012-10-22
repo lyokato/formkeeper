@@ -227,7 +227,7 @@ module FormKeeper
           action = @data[DEFAULT_ACTION_NAME]
           return search_from_action_part(action, target_name, constraint_name)
         else
-          return build_default_message(target_name)
+          return handle_missing_message(target_name)
         end
       end
     end
@@ -238,7 +238,7 @@ module FormKeeper
         field = action[target_name.to_s]
         return search_from_field_part(target_name, field, constraint_name)
       else
-        return build_default_message(target_name)
+        return handle_missing_message(target_name)
       end
     end
 
@@ -249,9 +249,13 @@ module FormKeeper
         if field.has_key?(DEFAULT_CONSTRAINT_NAME)
           return field[DEFAULT_CONSTRAINT_NAME]
         else
-          return build_default_message(target_name)
+          return handle_missing_message(target_name)
         end
       end
+    end
+
+    def handle_missing_message(target_name)
+      build_default_message(target_name)
     end
 
     def build_default_message(target_name)
@@ -274,7 +278,7 @@ module FormKeeper
       @failed_constraints.size > 0
     end
     def failed_by?(constraint)
-      @failed_constraints.include?(constraint)
+      @failed_constraints.include?(constraint.to_sym)
     end
   end
 
@@ -285,23 +289,59 @@ module FormKeeper
       @valid_params = {}
     end
     def <<(record)
-      @failed_records[record.name.to_sym] = record
+      if record.failed?
+        @failed_records[record.name.to_sym] = record
+      else
+        @valid_params[record.name.to_sym] = record.value
+      end
     end
     def [](name)
-      @valid_params[name]
+      @valid_params[name.to_sym]
     end
-    def []=(name, value)
-      @valid_params[name] = value
+    def valid_fields
+      @valid_params.keys
+    end
+    def valid?(name)
+      @valid_params.has_key?(name.to_sym)
     end
     def failed?
       !@failed_records.empty?
     end
-    def failed_on?(name)
-      @failed_records.has_key?(name.to_sym)
+    def failed_on?(name, constraint=nil)
+      return false unless @failed_records.has_key?(name.to_sym)
+      return true if constraint.nil?
+      record = @failed_records[name.to_sym]
+      record.failed_by?(constraint)
     end
-    #def failed_fields
-    #  @records.values.select(&:failed?).collect(&:name)
-    #end
+    def failed_fields
+      @failed_records.keys 
+    end
+    def failed_constraints(name)
+      return [] unless @failed_records.has_key?(name.to_sym)
+      record = @failed_records[name.to_sym]
+      record.failed_constraints
+    end
+    def messages(action, name=nil)
+      messages = []
+      if name.nil?
+        @failed_records.values.each do |record|
+          record.failed_constraints.each do |constraint|
+            messages << message(action, record.name, constraint)
+          end
+        end
+      else
+        if @failed_records.has_key?(name.to_sym)
+          record = @failed_records[name.to_sym]
+          record.failed_constraints.each do |constraint|
+            messages << message(action, record.name, constraint)
+          end
+        end
+      end
+      messages.select{ |m| not !m.nil? and !m.empty? }.uniq
+    end
+    def message(action, name, constrainat)
+      @messages.get(action, name, constraint)
+    end
   end
 
   class Rule
@@ -526,31 +566,15 @@ module FormKeeper
       report = Report.new(messages)
       rule.fields.each do |name, criteria|
         criteria.filters.concat(rule.default_filters)
-        record = validate_field(name, criteria, params)
-        if record.failed?
-          report << record
-        else
-          report[name] = record.value
-        end
+        report << validate_field(name, criteria, params)
       end
       rule.checkboxes.each do |name, criteria|
         criteria.filters.concat(rule.default_filters)
-        record = validate_checkbox(name, criteria, params)
-        if record.failed?
-          report << record
-        else
-          report[name] = record.value
-        end
+        report << validate_checkbox(name, criteria, params)
       end
       rule.combinations.each do |name, criteria|
         criteria.filters.concat(rule.default_filters)
-        record = validate_combination(name, criteria, params)
-        if record.failed?
-          report << record
-        else
-          # TODO later
-          #report[name] = record.value
-        end
+        report << validate_combination(name, criteria, params)
       end
       return report
     end
