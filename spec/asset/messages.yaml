@@ -1,0 +1,18 @@
+login:
+  username:
+    present: You must input name
+    ascii: Name should be ASCII 
+    length: Name's length should be between 8 and 16
+    DEFAULT: Input your name correctly!
+  password:
+    present: You must input password
+    ascii: Password should be ASCII 
+    length: Password's length should be between 8 and 16
+DEFAULT:
+  username:
+    ascii: Name should be ASCII 
+    length: Name's length should be between 8 and 16
+    DEFAULT: Input your name correctly!
+  password:
+    ascii: Password should be ASCII 
+    length: Password's length should be between 8 and 16
