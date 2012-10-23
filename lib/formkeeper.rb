@@ -35,6 +35,15 @@ module FormKeeper
       end
     end
 
+    class Custom < Base
+      def initialize(block)
+        @custom = block
+      end
+      def process(value)
+        @custom.call(value) 
+      end
+    end
+
     class UpCase < Base
       def process(value)
         return value.upcase
@@ -58,6 +67,15 @@ module FormKeeper
     class Base
       def validate(value, arg)
         return true
+      end
+    end
+
+    class Custom < Base
+      def initialize(block)
+        @custom = block
+      end
+      def validate(value, arg)
+        @custom.call(value, arg) 
       end
     end
 
