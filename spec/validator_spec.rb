@@ -80,7 +80,7 @@ describe FormKeeper::Validator do
     rule.filters :strip
     rule.field :username, :present => true, :length => 8..16
     rule.field :password, :present => true, :length => 8..16
-    rule.checkbox :colors, :count => 1..2
+    rule.selection :colors, :count => 1..2
 
     params = {}
     params['username'] = '  hogehogefoo'

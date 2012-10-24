@@ -599,10 +599,13 @@ module FormKeeper
       @fields[name.to_sym] = Criteria::Field.new(criteria)
     end
 
-    def checkbox(name, criteria)
+    def selection(name, criteria)
       raise ArgumentError.new unless criteria.kind_of?(Hash)
       @checkboxes[name.to_sym] = Criteria::Checkbox.new(criteria)
     end
+
+    # for backward-compatibility
+    alias_method :checkbox, :selection
 
     def combination(name, criteria)
       raise ArgumentError.new unless criteria.kind_of?(Hash)
