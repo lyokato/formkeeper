@@ -8,7 +8,7 @@ describe FormKeeper::Validator do
     rule.filters :strip
     rule.field :username, :present => true, :length => 8..16
     rule.field :password, :present => true, :length => 8..16
-    rule.field :nickname, :characters => 8..16, :filters => :upcase
+    rule.field :nickname, :bytesize => 8..16, :filters => :upcase
 
     params = {}
     params['username'] = '  hogehogefoo'
@@ -32,7 +32,7 @@ describe FormKeeper::Validator do
     rule.filters :strip
     rule.field :username, :present => true, :length => 8..16
     rule.field :password, :present => true, :length => 8..16
-    rule.field :nickname, :characters => 8..16, :filters => :upcase
+    rule.field :nickname, :bytesize => 8..16, :filters => :upcase
 
     params = {}
     params['username'] = '  hogehogefoo'

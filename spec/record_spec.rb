@@ -19,7 +19,7 @@ describe FormKeeper::Record do
     record.failed?.should be_true
     record.failed_by?(:present).should be_true
     record.failed_by?(:length).should be_true
-    record.failed_by?(:characters).should_not be_true
+    record.failed_by?(:bytesize).should_not be_true
 
     record.failed_constraints[0].should == :present
     record.failed_constraints[1].should == :length

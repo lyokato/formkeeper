@@ -45,9 +45,9 @@ describe FormKeeper::Respondent do
 <label>Sake</label><input type="radio" name="food" value="1">
 <label>Umeboshi</label><input type="radio" name="food" value="2">
 <h2>Where did you know about this page?</h2>
-<label>web site</label><input type="radio" name="media" value="0" checked>
-<label>magazine</label><input type="radio" name="media" value="1">
-<label>TV show</label><input type="radio" name="media" value="2">
+<label>web site</label><input type="checkbox" name="media" value="0" checked>
+<label>magazine</label><input type="checkbox" name="media" value="1">
+<label>TV show</label><input type="checkbox" name="media" value="2">
 </form>
 </body>
 </html>
@@ -63,9 +63,9 @@ describe FormKeeper::Respondent do
 <label>Sake</label><input type="radio" name="food" value="1" checked="checked" />
 <label>Umeboshi</label><input type="radio" name="food" value="2" />
 <h2>Where did you know about this page?</h2>
-<label>web site</label><input type="radio" name="media" value="0" />
-<label>magazine</label><input type="radio" name="media" value="1" checked="checked" />
-<label>TV show</label><input type="radio" name="media" value="2" checked="checked" />
+<label>web site</label><input type="checkbox" name="media" value="0" />
+<label>magazine</label><input type="checkbox" name="media" value="1" checked="checked" />
+<label>TV show</label><input type="checkbox" name="media" value="2" checked="checked" />
 </form>
 </body>
 </html>

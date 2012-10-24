@@ -87,10 +87,18 @@ module FormKeeper
       end
     end
 
+    class AsciiSpace < Base
+      def validate(value, arg)
+        result = value =~ /^[\x20-\x7e]+$/
+        result = !result if !arg
+        result
+      end
+    end
+
     class Regexp < Base
       def validate(value, arg)
         r = arg
-        r = Regexp.new(r) unless r.kind_of?(Regexp)
+        r = ::Regexp.new(r) unless r.kind_of?(::Regexp)
         value =~ r
       end
     end
@@ -145,7 +153,7 @@ module FormKeeper
 
     class URI < Base
       def validate(value, arg)
-        u = URI.parse(value)
+        u = ::URI.parse(value)
         return false if u.nil?
         arg = [arg] unless arg.kind_of?(Array)
         arg.collect(&:to_s).include?(u.scheme)
@@ -166,12 +174,12 @@ module FormKeeper
       end
     end
 
-    class Characters < Base
+    class ByteSize < Base
       def validate(value, arg)
-        l = value.split(//u).length
+        l = value.bytesize
         case arg
         when Fixnum
-          return (l == args)
+          return (l == arg)
         when Range
           return arg.include?(l)
         else
@@ -564,6 +572,7 @@ module FormKeeper
     register_filter :upcase, Filter::UpCase.new
 
     register_constraint :ascii, Constraint::Ascii.new
+    register_constraint :ascii_space, Constraint::AsciiSpace.new
     register_constraint :regexp, Constraint::Regexp.new
     register_constraint :int, Constraint::Int.new
     register_constraint :uint, Constraint::Uint.new
@@ -573,7 +582,7 @@ module FormKeeper
     register_constraint :alnum_space, Constraint::AlnumSpace.new
     register_constraint :uri, Constraint::URI.new
     register_constraint :length, Constraint::Length.new
-    register_constraint :characters, Constraint::Characters.new
+    register_constraint :bytesize, Constraint::ByteSize.new
 
     register_combination_constraint :datetime, CombinationConstraint::DateTime.new
     register_combination_constraint :date, CombinationConstraint::Date.new
