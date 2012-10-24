@@ -61,6 +61,12 @@ module FormKeeper
         return value.strip
       end
     end
+
+    class Capitalize < Base
+      def process(value)
+        return value.capitalize
+      end
+    end
   end
 
   module Constraint
@@ -106,16 +112,84 @@ module FormKeeper
     class Int < Base
       def validate(value, arg)
         result = value =~ /^\-?[[:digit:]]+$/
-        result = !result if !arg
-        result
+        if result and arg.kind_of?(Hash)
+          if arg.has_key?(:gt)
+            unless arg[:gt].kind_of?(Fixnum)
+              raise ArgumentError.new ':gt should be Fixnum'
+            end
+            return false unless value.to_i > arg[:gt];
+          end
+          if arg.has_key?(:gte)
+            unless arg[:gte].kind_of?(Fixnum)
+              raise ArgumentError.new ':gte should be Fixnum'
+            end
+            return false unless value.to_i >= arg[:gte];
+          end
+          if arg.has_key?(:lt)
+            unless arg[:lt].kind_of?(Fixnum)
+              raise ArgumentError.new ':lt should be Fixnum'
+            end
+            return false unless value.to_i < arg[:lt];
+          end
+          if arg.has_key?(:lte)
+            unless arg[:lte].kind_of?(Fixnum)
+              raise ArgumentError.new ':lte should be Fixnum'
+            end
+            return false unless value.to_i <= arg[:lte];
+          end
+          if arg.has_key?(:between)
+            unless arg[:between].kind_of?(Range)
+              raise ArgumentError.new ':between should be Range'
+            end
+            return false unless arg[:between].include?(value.to_i);
+          end
+          true
+        else
+          result = !result if !arg
+          result
+        end
       end
     end
 
     class Uint < Base
       def validate(value, arg)
         result = value =~ /^[[:digit:]]+$/
-        result = !result if !arg
-        result
+        if result and arg.kind_of?(Hash)
+          if arg.has_key?(:gt)
+            unless arg[:gt].kind_of?(Fixnum)
+              raise ArgumentError.new ':gt should be Fixnum'
+            end
+            return false unless value.to_i > arg[:gt];
+          end
+          if arg.has_key?(:gte)
+            unless arg[:gte].kind_of?(Fixnum)
+              raise ArgumentError.new ':gte should be Fixnum'
+            end
+            return false unless value.to_i >= arg[:gte];
+          end
+          if arg.has_key?(:lt)
+            unless arg[:lt].kind_of?(Fixnum)
+              raise ArgumentError.new ':lt should be Fixnum'
+            end
+            return false unless value.to_i < arg[:lt];
+          end
+          if arg.has_key?(:lte)
+            unless arg[:lte].kind_of?(Fixnum)
+              raise ArgumentError.new ':lte should be Fixnum'
+            end
+            return false unless value.to_i <= arg[:lte];
+          end
+          if arg.has_key?(:between)
+            unless arg[:between].kind_of?(Range)
+              raise ArgumentError.new ':between should be Range'
+            end
+            return false unless arg[:between].include?(value.to_i);
+          end
+          true
+        else
+          result = !result if !arg
+          result
+        end
       end
     end
 
@@ -573,6 +647,7 @@ module FormKeeper
     register_filter :strip, Filter::Strip.new
     register_filter :downcase, Filter::DownCase.new
     register_filter :upcase, Filter::UpCase.new
+    register_filter :capitalize, Filter::Capitalize.new
 
     register_constraint :ascii, Constraint::Ascii.new
     register_constraint :ascii_space, Constraint::AsciiSpace.new
