@@ -212,24 +212,27 @@ module FormKeeper
     class Date < Base
       def validate(values, arg)
         return false unless values.size == 3
+        return false unless values.all? { |v| v =~ /^[[:digit:]]+$/ }
         # TODO handle range by args[:from] and args[:to]
-        ::Date.valid_date?(values[0], values[1], values[2])
+        ::Date.valid_date?(values[0].to_i, values[1].to_i, values[2].to_i)
       end
     end
 
     class Time < Base
       def validate(values, arg)
         return false unless values.size == 3
+        return false unless values.all? { |v| v =~ /^[[:digit:]]+$/ }
         # TODO handle range by args[:from] and args[:to]
-        (0..23).include?(values[0]) and (0..59).include(values[1]) and (0..59).include(values[2])
+        (0..23).include?(values[0].to_i) and (0..59).include?(values[1].to_i) and (0..59).include?(values[2].to_i)
       end
     end
 
     class DateTime < Base
       def validate(values, arg)
         return false unless values.size == 6
+        return false unless values.all? { |v| v =~ /^[[:digit:]]+$/ }
         # TODO handle range by args[:from] and args[:to]
-        ::Date.valid_date?(values[0], values[1], values[2]) and (0..23).include?(values[3]) and (0..59).include(values[5]) and (0..59).include(values[5])
+        ::Date.valid_date?(values[0].to_i, values[1].to_i, values[2].to_i) and (0..23).include?(values[3].to_i) and (0..59).include?(values[4].to_i) and (0..59).include?(values[5].to_i)
       end
     end
   end 
