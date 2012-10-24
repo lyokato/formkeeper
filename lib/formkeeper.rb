@@ -234,6 +234,40 @@ module FormKeeper
       end
     end
 
+    class Email < Base
+
+      # borrowed from
+      # http://blog.everqueue.com/chiba/2009/03/22/163/
+      def build_regexp
+        wsp              = '[\x20\x09]'
+        vchar            = '[\x21-\x7e]'
+        quoted_pair      = "\\\\(?:#{vchar}|#{wsp})"
+        qtext            = '[\x21\x23-\x5b\x5d-\x7e]'
+        qcontent         = "(?:#{qtext}|#{quoted_pair})"
+        quoted_string    = "\"#{qcontent}*\""
+        atext            = '[a-zA-Z0-9!#$%&\'*+\-\/\=?^_`{|}~]'
+        dot_atom_text    = "#{atext}+(?:[.]#{atext}+)*"
+        dot_atom         = dot_atom_text
+        local_part       = "(?:#{dot_atom}|#{quoted_string})"
+        domain           = dot_atom
+        addr_spec        = "#{local_part}[@]#{domain}"
+        dot_atom_loose   = "#{atext}+(?:[.]|#{atext})*"
+        local_part_loose = "(?:#{dot_atom_loose}|#{quoted_string})"
+        addr_spec_loose  = "#{local_part_loose}[@]#{domain}"
+        addr_spec_loose
+      end
+
+      def regexp
+        @regexp ||= build_regexp
+      end
+
+      def validate(value, arg)
+        r = ::Regexp.new('^' + regexp + '$')
+        value =~ r
+      end
+
+    end
+
     class Length < Base
       def validate(value, arg)
         l = value.length
@@ -662,6 +696,7 @@ module FormKeeper
     register_constraint :alnum, Constraint::Alnum.new
     register_constraint :alnum_space, Constraint::AlnumSpace.new
     register_constraint :uri, Constraint::URI.new
+    register_constraint :email, Constraint::Email.new
     register_constraint :length, Constraint::Length.new
     register_constraint :bytesize, Constraint::ByteSize.new
 
