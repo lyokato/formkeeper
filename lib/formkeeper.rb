@@ -49,9 +49,10 @@ module FormKeeper
         @encoding = encoding
       end
       def process(value)
-        value.force_encoding(@encoding)
-        return value.encode('UTF-8') if value.valid_encoding?
-        value.encode('UTF-16', :invalid => :replace, :undef => :repace, :replace => '').encode('UTF-8')
+        v = value.dup
+        v.force_encoding(@encoding)
+        return v.encode('UTF-8') if v.valid_encoding?
+        value.encode('UTF-16', :invalid => :replace, :undef => :replace, :replace => '').encode('UTF-8')
       end
     end
 
@@ -626,13 +627,18 @@ module FormKeeper
       end
     end
 
-    attr_reader :default_filters, :fields, :checkboxes, :combinations
+    attr_reader :default_filters, :fields, :checkboxes, :combinations, :encoding_filter
 
     def initialize
       @default_filters = []
+      @encoding_filter = nil
       @fields = {}
       @checkboxes = {}
       @combinations = {}
+    end
+
+    def encoding(code)
+      @encoding_filter = Filter::ToUTF8.new(code)
     end
 
     def filters(*args)
@@ -684,10 +690,6 @@ module FormKeeper
       @@filter_store[name] = filter
     end
 
-    def self.register_utf8_encoding_filter(name, encoding)
-      @@filter_store[name] = Filter::ToUTF8.new(encoding)
-    end
-
     def self.register_constraint(name, constraint)
       @@constraint_store[name] = constraint
     end
@@ -700,8 +702,6 @@ module FormKeeper
     register_filter :downcase, Filter::DownCase.new
     register_filter :upcase, Filter::UpCase.new
     register_filter :capitalize, Filter::Capitalize.new
-
-    register_utf8_encoding_filter :utf8, 'UTF-8'
 
     register_constraint :ascii, Constraint::Ascii.new
     register_constraint :ascii_space, Constraint::AsciiSpace.new
@@ -730,36 +730,36 @@ module FormKeeper
       report = Report.new(messages)
       rule.fields.each do |name, criteria|
         criteria.filters.concat(rule.default_filters)
-        report << validate_field(name, criteria, params)
+        report << validate_field(name, criteria, params, rule.encoding_filter)
       end
       rule.checkboxes.each do |name, criteria|
         criteria.filters.concat(rule.default_filters)
-        report << validate_checkbox(name, criteria, params)
+        report << validate_checkbox(name, criteria, params, rule.encoding_filter)
       end
       rule.combinations.each do |name, criteria|
         criteria.filters.concat(rule.default_filters)
-        report << validate_combination(name, criteria, params)
+        report << validate_combination(name, criteria, params, rule.encoding_filter)
       end
       return report
     end
 
     private
-    def validate_combination(name, criteria, params)
+    def validate_combination(name, criteria, params, encoding)
       record = Record.new(name)
       values = criteria.fields.collect { |name| params[name.to_s] }
-      values = filter_combination_values(values, criteria.filters)
+      values = filter_combination_values(values, criteria.filters, encoding)
       constraint = find_combination_constraint(criteria.constraint)
       result = constraint.validate(values, criteria.arg)
       record.fail(name) unless result
       record
     end
 
-    def validate_checkbox(name, criteria, params)
+    def validate_checkbox(name, criteria, params, encoding)
       record = Record.new(name)
       if params.has_key?(name.to_s)
         values = params[name.to_s]
         if values.kind_of?(Array) 
-          values = filter_checkbox_values(values, criteria.filters)
+          values = filter_checkbox_values(values, criteria.filters, encoding)
           record.value = values
           if criteria.count.nil?
             if values.size == 0 
@@ -791,13 +791,13 @@ module FormKeeper
       record
     end
 
-    def filter_combination_values(values, filters)
-      values = values.collect{ |v| filter_value(v, filters) }
+    def filter_combination_values(values, filters, encoding)
+      values = values.collect{ |v| filter_value(v, filters, encoding) }
       values
     end
 
-    def filter_checkbox_values(values, filters)
-      values = filter_combination_values(values, filters)
+    def filter_checkbox_values(values, filters, encoding)
+      values = filter_combination_values(values, filters, encoding)
       values.delete_if { |v| v.nil? or v.empty? }
       values
     end
@@ -810,12 +810,12 @@ module FormKeeper
       end
     end
 
-    def validate_field(name, criteria, params)
+    def validate_field(name, criteria, params, encoding)
       record = Record.new name
       if params.has_key?(name.to_s)
         value = params[name.to_s]
         unless value.kind_of?(Array)
-          value = filter_field_value(value, criteria.filters)
+          value = filter_field_value(value, criteria.filters, encoding)
           record.value = value
           if value.empty?
             handle_missing_field(criteria, record)
@@ -831,8 +831,8 @@ module FormKeeper
       record
     end
 
-    def filter_field_value(value, filters)
-      filter_value(value, filters)
+    def filter_field_value(value, filters, encoding)
+      filter_value(value, filters, encoding)
     end
 
     def handle_missing_field(criteria, record)
@@ -858,7 +858,8 @@ module FormKeeper
       @@combination_constraint_store[type]
     end
 
-    def filter_value(value, filters)
+    def filter_value(value, filters, encoding)
+      value = encoding.process(value) unless encoding.nil?
       filters.each { |f| value = find_filter(f).process(value) }
       value
     end

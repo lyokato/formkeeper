@@ -10,6 +10,13 @@ describe FormKeeper::Filter::ToUTF8 do
     filter.process(value).should == "ほげほげ";
   end
 
+  it "handles invalid encoding value correctly" do
+
+    value = File.open(File.dirname(__FILE__) + '/asset/euc.txt') { |f| f.read.chomp }
+    filter = FormKeeper::Filter::ToUTF8.new('Shift_JIS')
+    filter.process(value).should_not == "ほげほげ";
+  end
+
   it "handles euc-jp value correctly" do
 
     value = File.open(File.dirname(__FILE__) + '/asset/euc.txt') { |f| f.read.chomp }

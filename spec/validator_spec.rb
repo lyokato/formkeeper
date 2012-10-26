@@ -1,3 +1,4 @@
+# -*- encoding: utf-8 -*-
 require 'spec_helper'
 
 describe FormKeeper::Validator do
@@ -25,6 +26,61 @@ describe FormKeeper::Validator do
     report[:nickname].should == 'HOGEHOGE BUZ'
 
   end
+
+  it "validates valid utf-8 encoding according to rule" do
+
+    rule = FormKeeper::Rule.new
+    rule.encoding 'UTF-8'
+    rule.filters :strip
+    rule.field :username, :present => true, :length => 8..16
+    rule.field :password, :present => true, :length => 8..16
+    rule.field :nickname, :length => 4..8
+
+    value = File.open(File.dirname(__FILE__) + '/asset/utf8.txt') { |f| f.read.chomp }
+
+    params = {}
+    params['username'] = '  hogehogefoo'
+    params['password'] = 'hogehogebar '
+    params['nickname'] = value
+
+    validator = FormKeeper::Validator.new
+    report = validator.validate(params, rule)
+
+    report.failed?.should_not be_true
+
+    report[:username].should == 'hogehogefoo'
+    report[:password].should == 'hogehogebar'
+    report[:nickname].should == 'ほげほげ'
+
+  end
+
+  it "validates valid non utf-8 encoding according to rule" do
+
+    rule = FormKeeper::Rule.new
+    rule.encoding 'EUC-JP'
+    rule.filters :strip
+    rule.field :username, :present => true, :length => 8..16
+    rule.field :password, :present => true, :length => 8..16
+    rule.field :nickname, :length => 4..8
+
+    value = File.open(File.dirname(__FILE__) + '/asset/euc.txt') { |f| f.read.chomp }
+
+    params = {}
+    params['username'] = '  hogehogefoo'
+    params['password'] = 'hogehogebar '
+    params['nickname'] = value
+
+    validator = FormKeeper::Validator.new
+    report = validator.validate(params, rule)
+
+    report.failed?.should_not be_true
+
+    report[:username].should == 'hogehogefoo'
+    report[:password].should == 'hogehogebar'
+    report[:nickname].should == 'ほげほげ'
+
+  end
+
 
   it "validates unpresent params according to rule" do
 
