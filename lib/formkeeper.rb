@@ -44,6 +44,17 @@ module FormKeeper
       end
     end
 
+    class ToUTF8 < Base
+      def initialize(encoding)
+        @encoding = encoding
+      end
+      def process(value)
+        value.force_encoding(@encoding)
+        return value.encode('UTF-8') if value.valid_encoding?
+        value.encode('UTF-16', :invalid => :replace, :undef => :repace, :replace => '').encode('UTF-8')
+      end
+    end
+
     class UpCase < Base
       def process(value)
         return value.upcase
@@ -673,6 +684,10 @@ module FormKeeper
       @@filter_store[name] = filter
     end
 
+    def self.register_utf8_encoding_filter(name, encoding)
+      @@filter_store[name] = Filter::ToUTF8.new(encoding)
+    end
+
     def self.register_constraint(name, constraint)
       @@constraint_store[name] = constraint
     end
@@ -685,6 +700,8 @@ module FormKeeper
     register_filter :downcase, Filter::DownCase.new
     register_filter :upcase, Filter::UpCase.new
     register_filter :capitalize, Filter::Capitalize.new
+
+    register_utf8_encoding_filter :utf8, 'UTF-8'
 
     register_constraint :ascii, Constraint::Ascii.new
     register_constraint :ascii_space, Constraint::AsciiSpace.new
