@@ -13,7 +13,7 @@ describe FormKeeper::Report do
     report << record1
     report << record2
 
-    report.failed?.should_not be_true
+    report.failed?.should_not eql(true)
     report[:username].should == 'foo'
     report[:password].should == 'bar'
 
@@ -36,14 +36,14 @@ describe FormKeeper::Report do
     report << record2
     report << record3
 
-    report.failed?.should be_true
-    report.failed_on?(:password).should be_true
-    report.failed_on?(:password, :length).should be_true
-    report.failed_on?(:password, :present).should_not be_true
-    report.failed_on?(:email).should be_true
-    report.failed_on?(:email, :present).should be_true
-    report.failed_on?(:email, :length).should be_true
-    report.failed_on?(:email, :ascii).should_not be_true
+    report.failed?.should eql(true)
+    report.failed_on?(:password).should eql(true)
+    report.failed_on?(:password, :length).should eql(true)
+    report.failed_on?(:password, :present).should_not eql(true)
+    report.failed_on?(:email).should eql(true)
+    report.failed_on?(:email, :present).should eql(true)
+    report.failed_on?(:email, :length).should eql(true)
+    report.failed_on?(:email, :ascii).should_not eql(true)
     report[:username].should == 'foo'
     report[:password].should be_nil
     report[:email].should be_nil

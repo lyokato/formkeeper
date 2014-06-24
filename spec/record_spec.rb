@@ -11,15 +11,15 @@ describe FormKeeper::Record do
     record.value = 'foo'
     record.value.should == 'foo'
 
-    record.failed?.should_not be_true
+    record.failed?.should_not eql(true)
 
     record.fail(:present)
     record.fail(:length)
 
-    record.failed?.should be_true
-    record.failed_by?(:present).should be_true
-    record.failed_by?(:length).should be_true
-    record.failed_by?(:bytesize).should_not be_true
+    record.failed?.should eql(true)
+    record.failed_by?(:present).should eql(true)
+    record.failed_by?(:length).should eql(true)
+    record.failed_by?(:bytesize).should_not eql(true)
 
     record.failed_constraints[0].should == :present
     record.failed_constraints[1].should == :length

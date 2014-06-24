@@ -19,7 +19,7 @@ describe FormKeeper::Validator do
     validator = FormKeeper::Validator.new
     report = validator.validate(params, rule)
 
-    report.failed?.should_not be_true
+    report.failed?.should_not eql(true)
 
     report[:username].should == 'hogehogefoo'
     report[:password].should == 'hogehogebar'
@@ -46,7 +46,7 @@ describe FormKeeper::Validator do
     validator = FormKeeper::Validator.new
     report = validator.validate(params, rule)
 
-    report.failed?.should_not be_true
+    report.failed?.should_not eql(true)
 
     report[:username].should == 'hogehogefoo'
     report[:password].should == 'hogehogebar'
@@ -73,7 +73,7 @@ describe FormKeeper::Validator do
     validator = FormKeeper::Validator.new
     report = validator.validate(params, rule)
 
-    report.failed?.should_not be_true
+    report.failed?.should_not eql(true)
 
     report[:username].should == 'hogehogefoo'
     report[:password].should == 'hogehogebar'
@@ -101,8 +101,8 @@ describe FormKeeper::Validator do
     report[:username].should == 'hogehogefoo'
     report[:nickname].should == 'HOGEHOGE BUZ'
 
-    report.failed?.should be_true
-    report.failed_on?(:password).should be_true
+    report.failed?.should eql(true)
+    report.failed_on?(:password).should eql(true)
 
   end
 
@@ -122,7 +122,7 @@ describe FormKeeper::Validator do
     validator = FormKeeper::Validator.new
     report = validator.validate(params, rule)
 
-    report.failed?.should_not be_true
+    report.failed?.should_not eql(true)
     #valid_params.keys.size.should == 3
     report[:username].should == 'hogehogefoo'
     report[:password].should == 'hogehogebar'
@@ -150,7 +150,7 @@ describe FormKeeper::Validator do
     report[:username].should == 'hogehogefoo'
     report[:password].should == 'hogehogebar'
 
-    report.failed?.should be_true
+    report.failed?.should eql(true)
   end
 
   it "validates empty checkbox params" do
@@ -173,7 +173,7 @@ describe FormKeeper::Validator do
     report[:username].should == 'hogehogefoo'
     report[:password].should == 'hogehogebar'
 
-    report.failed?.should be_true
+    report.failed?.should eql(true)
 
   end
 
@@ -197,7 +197,7 @@ describe FormKeeper::Validator do
     report[:username].should == 'hogehogefoo'
     report[:password].should == 'hogehogebar'
 
-    report.failed?.should be_true
+    report.failed?.should eql(true)
 
   end
 
@@ -222,7 +222,7 @@ describe FormKeeper::Validator do
     report[:password].should == 'hogehogebar'
     report[:colors].should == ['white', 'black']
 
-    report.failed?.should_not be_true
+    report.failed?.should_not eql(true)
 
   end
 
@@ -246,7 +246,7 @@ describe FormKeeper::Validator do
     report[:username].should == 'hogehogefoo'
     report[:password].should == 'hogehogebar'
 
-    report.failed?.should be_true
+    report.failed?.should eql(true)
     report.failed_on?(:colors)
   end
 
@@ -271,7 +271,7 @@ describe FormKeeper::Validator do
     report[:username].should == 'hogehogefoo'
     report[:password].should == 'hogehogebar'
 
-    report.failed?.should_not be_true
+    report.failed?.should_not eql(true)
 
   end
 
@@ -296,7 +296,7 @@ describe FormKeeper::Validator do
     report[:username].should == 'hogehogefoo'
     report[:password].should == 'hogehogebar'
 
-    report.failed?.should_not be_true
+    report.failed?.should_not eql(true)
 
   end
 
@@ -321,8 +321,8 @@ describe FormKeeper::Validator do
     report[:username].should == 'hogehogefoo'
     report[:password].should == 'hogehogebar'
 
-    report.failed?.should be_true
-    report.failed_on?(:same_email_address).should be_true
+    report.failed?.should eql(true)
+    report.failed_on?(:same_email_address).should eql(true)
 
   end
 end
