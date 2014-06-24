@@ -447,6 +447,15 @@ module FormKeeper
     def [](name)
       @valid_params[name.to_sym]
     end
+    def value(name)
+      name = name.to_sym
+      return self[name] if valid?(name)
+      if failed_fields.include?(name)
+        @failed_records[name].value
+      else
+        raise ArgumentError, "unknown field :#{name}"
+      end
+    end
     def valid_fields
       @valid_params.keys
     end

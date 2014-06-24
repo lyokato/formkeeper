@@ -79,5 +79,31 @@ describe FormKeeper::Report do
     report.message(:login, :password, :length).should == "Password's length should be between 8 and 16"
   end
 
+  it "provides access to form inputs" do
+
+    messages = FormKeeper::Messages.from_file(File.dirname(__FILE__) + '/asset/messages.yaml')
+
+    report = FormKeeper::Report.new(messages)
+    record1 = FormKeeper::Record.new(:name)
+    record1.value = 'foo'
+    record2 = FormKeeper::Record.new(:email)
+    record2.value = 'bar'
+    record3 = FormKeeper::Record.new(:contact)
+    record3.value = 'baz'
+    record2.fail(:email)
+
+    report << record1
+    report << record2
+    report << record3
+
+    report.value(:name).should eql('foo')
+    report.value(:email).should eql('bar')
+    report.value(:contact).should eql('baz')
+
+    expect {
+      report.value(:blegga)
+    }.to raise_error(ArgumentError, "unknown field :blegga")
+  end
+
 
 end
