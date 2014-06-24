@@ -3,7 +3,7 @@ require 'spec_helper'
 
 describe FormKeeper::CombinationConstraint::Any do
 
-  it "validates value correctly" do
+  it "validates values correctly" do
 
     constraint = FormKeeper::CombinationConstraint::Any.new
     constraint.validate(['aaaa', 'bbbb'], true).should eql(true)
