@@ -6,10 +6,10 @@ describe FormKeeper::Constraint::AsciiSpace do
   it "validate value correctly" do
 
     constraint = FormKeeper::Constraint::AsciiSpace.new
-    constraint.validate('aaaa', true).should be_true
-    constraint.validate('a%[]Aaa', false).should_not be_true
-    constraint.validate('[aAaa.', true).should be_true
-    constraint.validate('[a Aaa.', true).should be_true
+    constraint.validate('aaaa', true).should eql(true)
+    constraint.validate('a%[]Aaa', false).should_not eql(true)
+    constraint.validate('[aAaa.', true).should eql(true)
+    constraint.validate('[a Aaa.', true).should eql(true)
 
   end
 

@@ -101,7 +101,7 @@ module FormKeeper
       def validate(value, arg)
         result = value =~ /^[\x21-\x7e]+$/
         result = !result if !arg
-        result
+        !!result
       end
     end
 
@@ -109,7 +109,7 @@ module FormKeeper
       def validate(value, arg)
         result = value =~ /^[\x20-\x7e]+$/
         result = !result if !arg
-        result
+        !!result
       end
     end
 
@@ -117,7 +117,7 @@ module FormKeeper
       def validate(value, arg)
         r = arg
         r = ::Regexp.new(r) unless r.kind_of?(::Regexp)
-        value =~ r
+        !!(value =~ r)
       end
     end
 
@@ -158,7 +158,7 @@ module FormKeeper
           true
         else
           result = !result if !arg
-          result
+          !!result
         end
       end
     end
@@ -200,7 +200,7 @@ module FormKeeper
           true
         else
           result = !result if !arg
-          result
+          !!result
         end
       end
     end
@@ -209,7 +209,7 @@ module FormKeeper
       def validate(value, arg)
         result = value =~ /^[[:alpha:]]+$/
         result = !result if !arg
-        result
+        !!result
       end
     end
 
@@ -217,7 +217,7 @@ module FormKeeper
       def validate(value, arg)
         result = value =~ /^[[:alpha:][:space:]]+$/
         result = !result if !arg
-        result
+        !!result
       end
     end
 
@@ -225,7 +225,7 @@ module FormKeeper
       def validate(value, arg)
         result = value =~ /^[[:alnum:]]+$/
         result = !result if !arg
-        result
+        !!result
       end
     end
 
@@ -233,7 +233,7 @@ module FormKeeper
       def validate(value, arg)
         result = value =~ /^[[:alnum:][:space:]]+$/
         result = !result if !arg
-        result
+        !!result
       end
     end
 
@@ -275,7 +275,7 @@ module FormKeeper
 
       def validate(value, arg)
         r = ::Regexp.new('^' + regexp + '$')
-        value =~ r
+        !!(value =~ r)
       end
 
     end
@@ -289,7 +289,7 @@ module FormKeeper
         when Range
           return arg.include?(l)
         else
-          raise ArgumentError.new('Invalid number of arguments')
+          raise ArgumentError, 'Invalid number of arguments'
         end
       end
     end
@@ -303,7 +303,7 @@ module FormKeeper
         when Range
           return arg.include?(l)
         else
-          raise ArgumentError.new('Invalid number of arguments')
+          raise ArgumentError, 'Invalid number of arguments'
         end
       end
     end
@@ -446,6 +446,11 @@ module FormKeeper
     end
     def [](name)
       @valid_params[name.to_sym]
+    end
+    def value(name)
+      name = name.to_sym
+      return self[name] if valid?(name)
+      failed_fields.include?(name) ? @failed_records[name].value : nil
     end
     def valid_fields
       @valid_params.keys

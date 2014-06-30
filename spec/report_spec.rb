@@ -13,7 +13,7 @@ describe FormKeeper::Report do
     report << record1
     report << record2
 
-    report.failed?.should_not be_true
+    report.failed?.should_not eql(true)
     report[:username].should == 'foo'
     report[:password].should == 'bar'
 
@@ -36,14 +36,14 @@ describe FormKeeper::Report do
     report << record2
     report << record3
 
-    report.failed?.should be_true
-    report.failed_on?(:password).should be_true
-    report.failed_on?(:password, :length).should be_true
-    report.failed_on?(:password, :present).should_not be_true
-    report.failed_on?(:email).should be_true
-    report.failed_on?(:email, :present).should be_true
-    report.failed_on?(:email, :length).should be_true
-    report.failed_on?(:email, :ascii).should_not be_true
+    report.failed?.should eql(true)
+    report.failed_on?(:password).should eql(true)
+    report.failed_on?(:password, :length).should eql(true)
+    report.failed_on?(:password, :present).should_not eql(true)
+    report.failed_on?(:email).should eql(true)
+    report.failed_on?(:email, :present).should eql(true)
+    report.failed_on?(:email, :length).should eql(true)
+    report.failed_on?(:email, :ascii).should_not eql(true)
     report[:username].should == 'foo'
     report[:password].should be_nil
     report[:email].should be_nil
@@ -77,6 +77,32 @@ describe FormKeeper::Report do
     report.messages(:login, :password).should == ["Password's length should be between 8 and 16"]
     report.message(:login, :password, :ascii).should be_nil
     report.message(:login, :password, :length).should == "Password's length should be between 8 and 16"
+  end
+
+  it "provides access to form inputs" do
+
+    messages = FormKeeper::Messages.from_file(File.dirname(__FILE__) + '/asset/messages.yaml')
+
+    report = FormKeeper::Report.new(messages)
+    record1 = FormKeeper::Record.new(:name)
+    record1.value = 'foo'
+    record2 = FormKeeper::Record.new(:email)
+    record2.value = 'bar'
+    record3 = FormKeeper::Record.new(:contact)
+    record3.value = 'baz'
+    record2.fail(:email)
+
+    report << record1
+    report << record2
+    report << record3
+
+    report.value(:name).should eql('foo')
+    report.value(:email).should eql('bar')
+    report.value(:contact).should eql('baz')
+
+    expect {
+      report.value(:blegga)
+    }.to raise_error(ArgumentError, "unknown field :blegga")
   end
 
 
