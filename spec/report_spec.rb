@@ -100,9 +100,10 @@ describe FormKeeper::Report do
     report.value(:email).should eql('bar')
     report.value(:contact).should eql('baz')
 
-    expect {
-      report.value(:blegga)
-    }.to raise_error(ArgumentError, "unknown field :blegga")
+    #expect {
+    #  report.value(:blegga)
+    #}.to raise_error(ArgumentError, "unknown field :blegga")
+    report.value(:blegga).should be_nil
   end
 
 
