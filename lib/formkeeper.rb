@@ -323,6 +323,13 @@ module FormKeeper
       end
     end
 
+    class Different < Base
+      def validate(values, arg)
+        return false unless values.size == 2
+        values[0] != values[1]
+      end
+    end
+
     class Any < Base
       def validate(values, arg)
         values.any? { |v| not (v.nil? or v.empty?) }
@@ -726,6 +733,7 @@ module FormKeeper
     register_combination_constraint :date, CombinationConstraint::Date.new
     register_combination_constraint :time, CombinationConstraint::Time.new
     register_combination_constraint :same, CombinationConstraint::Same.new
+    register_combination_constraint :diff, CombinationConstraint::Different.new
     register_combination_constraint :any, CombinationConstraint::Any.new
 
     def initialize

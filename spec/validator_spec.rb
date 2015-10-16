@@ -250,7 +250,7 @@ describe FormKeeper::Validator do
     report.failed_on?(:colors)
   end
 
-  it "validates combination params" do
+  it "validates combination same params" do
 
     rule = FormKeeper::Rule.new
     rule.filters :strip
@@ -275,7 +275,7 @@ describe FormKeeper::Validator do
 
   end
 
-  it "validates combination params by synonym" do
+  it "validates combination same params by synonym" do
 
     rule = FormKeeper::Rule.new
     rule.filters :strip
@@ -300,7 +300,7 @@ describe FormKeeper::Validator do
 
   end
 
-  it "validates invalid combination params" do
+  it "validates invalid combination same params" do
 
     rule = FormKeeper::Rule.new
     rule.filters :strip
@@ -325,5 +325,74 @@ describe FormKeeper::Validator do
     report.failed_on?(:same_email_address).should eql(true)
 
   end
-end
 
+  it "validates combination diff params" do
+
+    rule = FormKeeper::Rule.new
+    rule.filters :strip
+    rule.field :old_password, :present => true, :length => 8..16
+    rule.field :new_password, :present => true, :length => 8..16
+    rule.combination :different_password, :fields => [:old_password, :new_password], :diff => true
+
+    params = {}
+    params['old_password'] = 'hogehogebar_old '
+    params['new_password'] = 'hogehogebar_new  '
+
+    validator = FormKeeper::Validator.new
+    report = validator.validate(params, rule)
+
+    #valid_params.keys.size.should == 2
+    report[:old_password].should == 'hogehogebar_old'
+    report[:new_password].should == 'hogehogebar_new'
+
+    report.failed?.should_not eql(true)
+
+  end
+
+  it "validates combination diff params by synonym" do
+
+    rule = FormKeeper::Rule.new
+    rule.filters :strip
+    rule.field :old_password, :present => true, :length => 8..16
+    rule.field :new_password, :present => true, :length => 8..16
+    rule.diff :different_password, [:old_password, :new_password], :filters => :upcase
+
+    params = {}
+    params['old_password'] = 'hogehogebar_old '
+    params['new_password'] = 'hogehogebar_new  '
+
+    validator = FormKeeper::Validator.new
+    report = validator.validate(params, rule)
+
+    #valid_params.keys.size.should == 2
+    report[:old_password].should == 'hogehogebar_old'
+    report[:new_password].should == 'hogehogebar_new'
+
+    report.failed?.should_not eql(true)
+
+  end
+
+  it "validates invalid combination diff params" do
+
+    rule = FormKeeper::Rule.new
+    rule.filters :strip
+    rule.field :old_password, :present => true, :length => 8..16
+    rule.field :new_password, :present => true, :length => 8..16
+    rule.diff :different_password, [:old_password, :new_password], :filters => :upcase
+
+    params = {}
+    params['old_password'] = 'hogehogebar_old '
+    params['new_password'] = 'hogehogebar_old  '
+
+    validator = FormKeeper::Validator.new
+    report = validator.validate(params, rule)
+
+    #valid_params.keys.size.should == 2
+    report[:old_password].should == 'hogehogebar_old'
+    report[:new_password].should == 'hogehogebar_old'
+
+    report.failed?.should eql(true)
+    report.failed_on?(:different_password).should eql(true)
+
+  end
+end
