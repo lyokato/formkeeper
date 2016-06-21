@@ -307,6 +307,12 @@ module FormKeeper
         end
       end
     end
+
+    class Any < Base
+      def validate(value, arg)
+        return arg.include?(value)
+      end
+    end
   end
 
   module CombinationConstraint
@@ -728,6 +734,7 @@ module FormKeeper
     register_constraint :email, Constraint::Email.new
     register_constraint :length, Constraint::Length.new
     register_constraint :bytesize, Constraint::ByteSize.new
+    register_constraint :any, Constraint::Any.new
 
     register_combination_constraint :datetime, CombinationConstraint::DateTime.new
     register_combination_constraint :date, CombinationConstraint::Date.new
